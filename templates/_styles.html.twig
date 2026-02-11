@@ -1,0 +1,28 @@
+{# Common styles and scripts for all pages #}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="{{ asset('css/global.css') }}" rel="stylesheet">
+
+<style>
+    :root {
+        --primary-color: #667eea;
+        --secondary-color: #764ba2;
+        --success-color: #27ae60;
+        --light-bg: #f8f9fa;
+        --dark-text: #2c3e50;
+        --border-color: #e0e0e0;
+    }
+
+    body {
+        {% if theme == 'dark' %}
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #ecf0f1;
+        {% else %}
+        background: var(--light-bg);
+        color: var(--dark-text);
+        {% endif %}
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

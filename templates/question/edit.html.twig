@@ -1,60 +1,394 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Question Details</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    {% if theme == 'light' %}
-        <link rel="stylesheet" href="{{ asset('css/theme-light.css') }}">
-    {% else %}
-        <link rel="stylesheet" href="{{ asset('css/theme-dark.css') }}">
-    {% endif %}
-    
+    <title>Modifier une Question</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            {% if theme == 'dark' %}
+            background: #1a1a2e;
+            color: #ecf0f1;
+            {% else %}
+            background: var(--light-bg);
+            color: var(--dark-text);
+            {% endif %}
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-custom h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .navbar-custom .nav-links {
+            display: flex;
+            gap: 15px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-custom .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-custom .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .form-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-card h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-text);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .answers-group {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .answers-group h4 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .answer-item {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .answer-item input {
+            width: 100%;
+        }
+
+        .answer-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+            color: white;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #c0392b 100%);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+            color: white;
+        }
+
+        .btn-back {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        {% if theme == 'dark' %}
+        .form-card {
+            background: #34495e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-card h2 {
+            color: #ecf0f1;
+        }
+
+        .form-group label {
+            color: #ecf0f1;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            background: #2c3e50;
+            border-color: #445a6f;
+            color: #ecf0f1;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .answers-group {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #445a6f;
+        }
+
+        .answers-group h4 {
+            color: #667eea;
+        }
+
+        .answer-item {
+            background: #2c3e50;
+            border-color: #445a6f;
+        }
+
+        .answer-item input {
+            background: #2c3e50;
+            border-color: #445a6f;
+            color: #ecf0f1;
+        }
+        {% endif %}
+
+        @media (max-width: 768px) {
+            .navbar-custom h1 {
+                font-size: 22px;
+            }
+
+            .form-card {
+                padding: 25px;
+            }
+
+            .form-card h2 {
+                font-size: 22px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-submit,
+            .btn-delete,
+            .btn-back {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class=" px-4 flex justify-between items-center">
-        <h1 class="">Modifier la question</h1>
-        <div class="flex space-x-2">
-            <a href="{{ path('qcm_show', {'idA': admin_id, 'idC': idC , 'id': qcm.id}) }}" class="button px-4 py-2 rounded-md hover:bg-gray-400">
-                <i class="fas fa-arrow-rotate-left"></i> 
-            </a>
-        </div>
-    </nav>
-
-    
- 
-    <div class="container mx-auto mt-8">
-    <form action="{{ path('edit_question', {'idA': admin_id, 'idC': qcm.course.id, 'idQ': qcm.id, 'id':question.id}) }}" class="p-2" method="POST">
-        {{ form_start(form) }}
-        <div class="mb-4">
-            {{ form_label(form.content, 'Contenu :', {'class': 'block text-gray-700 text-sm font-bold mb-2'}) }}
-            {{ form_widget(form.content, {'class': 'text-gray-900 input-color mt-1 w-full'}) }}
-        </div>
-        <div class="mb-4">
-            {{ form_label(form.lesson, 'Leçon :', {'class': 'block text-gray-700 text-sm font-bold mb-2'}) }}
-            {{ form_widget(form.lesson, {'class': 'input-color mt-1 w-full'}) }}
-        </div>
-        <div class="mb-4">
-            {{ form_label(form.answers, 'Réponses :', {'class': 'block text-gray-700 text-sm font-bold mb-2'}) }}
-            <ul>
-                {% for answerField in form.answers %}
-                    <li>{{ form_widget(answerField, {'attr': {'class': 'mx-8 input-color bg-gray-100 mt-1  mb-2'}}) }}</li>
-                {% endfor %}
+    <!-- Navbar -->
+    <div class="navbar-custom">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <h1><i class="fas fa-edit"></i> Modifier la Question</h1>
+            <ul class="nav-links">
+                <li><a href="{{ path('qcm_show', {'idA': admin_id, 'idC': qcm.course.id, 'id': qcm.id}) }}"><i class="fas fa-arrow-left"></i> Retour au QCM</a></li>
             </ul>
         </div>
-        <div class="mb-4">
-            {{ form_label(form.correctAnswerIndex, 'Bonne réponse :', {'class': 'block text-gray-700 text-sm font-bold mb-2'}) }}
-            {{ form_widget(form.correctAnswerIndex, {'class': 'input-color mt-1 w-full'}) }}
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <div class="form-card">
+            <h2>
+                <i class="fas fa-question-circle"></i>
+                Éditer la Question
+            </h2>
+
+            <form action="{{ path('edit_question', {'idA': admin_id, 'idC': qcm.course.id, 'idQ': qcm.id, 'id': question.id}) }}" method="POST">
+                {{ form_start(form) }}
+
+                <!-- Content Field -->
+                <div class="form-group">
+                    <label for="{{ form.content.vars.id }}">
+                        <i class="fas fa-file-alt"></i> Contenu de la Question
+                    </label>
+                    {{ form_widget(form.content) }}
+                    {{ form_errors(form.content) }}
+                </div>
+
+                <!-- Lesson Field -->
+                <div class="form-group">
+                    <label for="{{ form.lesson.vars.id }}">
+                        <i class="fas fa-book"></i> Leçon
+                    </label>
+                    {{ form_widget(form.lesson) }}
+                    {{ form_errors(form.lesson) }}
+                </div>
+
+                <!-- Answers Section -->
+                <div class="form-group">
+                    <div class="answers-group">
+                        <h4><i class="fas fa-list"></i> Réponses Possibles</h4>
+                        {% for answerField in form.answers %}
+                            <div class="answer-item">
+                                {{ form_widget(answerField) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {{ form_errors(form.answers) }}
+                </div>
+
+                <!-- Correct Answer Field -->
+                <div class="form-group">
+                    <label for="{{ form.correctAnswerIndex.vars.id }}">
+                        <i class="fas fa-check-circle"></i> Bonne Réponse (Index)
+                    </label>
+                    {{ form_widget(form.correctAnswerIndex) }}
+                    {{ form_errors(form.correctAnswerIndex) }}
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i> Modifier
+                    </button>
+
+                    <form method="post" action="{{ path('delete_question', {'idA': admin_id, 'idC': qcm.course.id, 'idQ': qcm.id, 'id': question.id}) }}" style="display: inline-block;">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ question.id) }}">
+                        <button type="submit" class="btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette question ?')">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </form>
+
+                    <a href="{{ path('qcm_show', {'idA': admin_id, 'idC': qcm.course.id, 'id': qcm.id}) }}" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </a>
+                </div>
+
+                {{ form_end(form) }}
+            </form>
         </div>
-        <button type="submit" class="mt-4 inline-block button text-gray-800 px-4 py-2 rounded-md ">Modifier</button>
-        {{ form_end(form) }}
-    </form>
-</div>
+    </div>
 
-
-
-  
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

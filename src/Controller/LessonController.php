@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 use Symfony\Component\Routing\Attribute\Route;
 
 
@@ -31,9 +31,9 @@ class LessonController extends AbstractController
 
  
     #[Route('/new', name: 'new_lesson', methods: ['GET', 'POST'])]
-    public function new(Request $request , int $idA, int $idC, SessionInterface $session): Response
+    public function new(Request $request , int $idA, int $idC): Response
     {
-        $theme = $session->get('theme', 'light'); 
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
         $course = $this->doctrine->getRepository(Course::class)->find($idC);
         
 
@@ -114,9 +114,9 @@ class LessonController extends AbstractController
     
  
     #[Route('/{id}/edit', name: 'edit_lesson', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Lesson $lesson, EntityManagerInterface $entityManager, int $idA, int $idC, SessionInterface $session): Response
+    public function edit(Request $request, Lesson $lesson, EntityManagerInterface $entityManager, int $idA, int $idC): Response
     {
-        $theme = $session->get('theme', 'light'); 
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
         $form = $this->createForm(LessonType::class, $lesson);
         $form->handleRequest($request);
     
@@ -158,9 +158,9 @@ class LessonController extends AbstractController
     
 
     #[Route('/{id}', name: 'delete_lesson', methods: ['POST'])]
-    public function delete(Request $request, Lesson $lesson, EntityManagerInterface $entityManager, int $idA, int $idC, SessionInterface $session): Response
+    public function delete(Request $request, Lesson $lesson, EntityManagerInterface $entityManager, int $idA, int $idC): Response
     {
-        $theme = $session->get('theme', 'light'); 
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
         if ($this->isCsrfTokenValid('delete'.$lesson->getId(), $request->request->get('_token'))) {
             $entityManager->remove($lesson);
             $entityManager->flush();
@@ -171,9 +171,9 @@ class LessonController extends AbstractController
 
     
     #[Route('/{id}', name: 'show_lesson', methods: ['GET'])]
-    public function show(Lesson $lesson, int $idC, int $idA, SessionInterface $session ): Response
+    public function show(Lesson $lesson, int $idC, int $idA, Request $request ): Response
     {
-        $theme = $session->get('theme', 'light'); 
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
         return $this->render('lesson/show.html.twig', [
             'lesson' => $lesson,
             'admin_id' => $idA,

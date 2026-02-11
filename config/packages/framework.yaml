@@ -1,11 +1,11 @@
-# see https://symfony.com/doc/current/reference/configuration/framework.html
+# see https://symfony.com/doc/current/reference/configuration/framework.yaml
 framework:
     secret: '%env(APP_SECRET)%'
     #csrf_protection: true
 
-    # Note that the session will be started ONLY if you read or write from it.
     session: 
         enabled: true
+        handler_id: null
 
     #esi: true
     #fragments: true

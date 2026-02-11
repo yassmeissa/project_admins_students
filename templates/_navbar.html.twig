@@ -1,0 +1,21 @@
+{# Reusable navbar component #}
+<div class="navbar-custom">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+        <h1>
+            {% if icon %}
+                <i class="fas fa-{{ icon }}"></i>
+            {% endif %}
+            {{ title }}
+        </h1>
+        <ul class="nav-links">
+            {% for link in links %}
+                <li>
+                    <a href="{{ link.url }}" {% if link.class %}class="{{ link.class }}"{% endif %}>
+                        {% if link.icon %}<i class="fas fa-{{ link.icon }}"></i>{% endif %}
+                        {{ link.label }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

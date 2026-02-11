@@ -5,13 +5,14 @@ namespace App\Controller;
 
 use App\Entity\Lesson;
 use App\Repository\CourseRepository;
+use App\Repository\UserRepository;
+use App\Service\ThemeProvider;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 
@@ -21,21 +22,25 @@ class StudentCourseController extends AbstractController
   
     private $courseRepository;
     private $doctrine;
+    private $themeProvider;
+    private $userRepository;
 
 
-    public function __construct( CourseRepository $courseRepository, ManagerRegistry $doctrine)
+    public function __construct(CourseRepository $courseRepository, ManagerRegistry $doctrine, ThemeProvider $themeProvider, UserRepository $userRepository)
     {
      
         $this->courseRepository = $courseRepository;
         $this->doctrine = $doctrine;
+        $this->themeProvider = $themeProvider;
+        $this->userRepository = $userRepository;
 
      
     }
 
     #[Route('/courses/{courseId}/lessons', name: 'course_lessons')]
-    public function showCourseLessons(int $courseId, int $idS, SessionInterface $session): Response
+    public function showCourseLessons(int $courseId, int $idS, Request $request): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $this->themeProvider->getTheme($request);
 
         // Récupérer le cours depuis la base de données
         $course = $this->courseRepository->find($courseId);
@@ -103,15 +108,15 @@ class StudentCourseController extends AbstractController
 
    
     #[Route('/cours-disponibles', name: 'cours_disponibles')]
-    public function afficherCoursDisponibles(CourseRepository $courseRepository, int $idS, SessionInterface $session): Response
+    public function afficherCoursDisponibles(CourseRepository $courseRepository, int $idS, Request $request): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $this->themeProvider->getTheme($request);
     
-        // Récupérer l'utilisateur actuellement connecté
-        $utilisateur = $this->getUser();
+        // Récupérer l'utilisateur actuellement connecté par son ID dans l'URL
+        $utilisateur = $this->userRepository->find($idS);
     
         // Récupérer tous les cours auxquels l'utilisateur n'est pas inscrit
-        $coursNonInscrits = $courseRepository->findCoursNonInscrits($utilisateur);
+        $coursNonInscrits = $this->courseRepository->findCoursNonInscrits($utilisateur);
     
         // Assurez-vous que $coursNonInscrits est bien une collection d'objets Course
         if (!is_iterable($coursNonInscrits)) {

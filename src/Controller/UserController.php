@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -24,9 +24,9 @@ class UserController extends AbstractController
     }
 
     #[Route('/manage-users', name: 'user_index')]
-    public function manageUsers(int $idA, SessionInterface $session): Response
+    public function manageUsers(int $idA, Request $request): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
 
         $users = $this->userRepository->findNonAdminUsers();
 
@@ -38,9 +38,9 @@ class UserController extends AbstractController
     }
    
     #[Route('/new', name: 'new_user', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, int $idA, SessionInterface $session): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher, int $idA): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
 
         // Créer une nouvelle instance de l'entité User
         $user = new User();
@@ -71,9 +71,9 @@ class UserController extends AbstractController
 
 
     #[Route('/{id}', name: 'show_user', methods: ['GET'])]
-    public function show(User $user, int $idA, SessionInterface $session): Response
+    public function show(User $user, int $idA, Request $request): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
 
         return $this->render('user/show.html.twig', [
             'user' => $user,
@@ -85,9 +85,9 @@ class UserController extends AbstractController
 
 
     #[Route('/{id}/edit', name: 'edit_user' , methods: ['GET', 'POST'])]
-   public function editUser(Request $request, User $user, EntityManagerInterface $entityManager, int $idA, SessionInterface $session): Response
+   public function editUser(Request $request, User $user, EntityManagerInterface $entityManager, int $idA): Response
    {
-    $theme = $session->get('theme', 'light');
+    $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
 
        $form = $this->createForm(UserType::class, $user);
        $form->handleRequest($request);
@@ -118,9 +118,9 @@ class UserController extends AbstractController
     }
 
     #[Route("/search", name: "search_user", methods: ["GET"])]
-    public function search(Request $request, $idA, UserRepository $userRepository, SessionInterface $session): Response
+    public function search(Request $request, $idA, UserRepository $userRepository): Response
    {
-        $theme = $session->get('theme', 'light');
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
  
        // Récupérer le terme de recherche de la requête GET
        $query = $request->query->get('query');

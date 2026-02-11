@@ -6,10 +6,11 @@ use App\Entity\Theme;
 use App\Repository\CourseRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/student/{idS}')]
@@ -27,34 +28,44 @@ class PopUpController extends AbstractController
   
 
     #[Route('/popup', name: 'show_popup')]
-    public function showPopup(int $idS, SessionInterface $session): Response
+    public function showPopup(int $idS, Request $request): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
 
-        // Vérifier si la session indiquant que le pop-up a déjà été affiché existe
-        if (!$session->has('popup_shown')) {
-            // Si la session n'existe pas, marquez le pop-up comme affiché en définissant une variable de session
-            $session->set('popup_shown', true);
-
-            // Récupérer les thèmes et les cours depuis la base de données
+        // Vérifier si le popup a déjà été affiché via un cookie
+        if (!$request->cookies->has('popup_shown')) {
+            // Récupérer les thèmes depuis la base de données
             $themes = $this->doctrine->getRepository(Theme::class)->findAll();
 
-            // Afficher le pop-up avec les thèmes et les cours
-            return $this->render('popup/index.html.twig', [
+            // Créer une réponse avec le pop-up
+            $response = $this->render('popup/index.html.twig', [
                 'student_id' => $idS,
-                'theme' =>$theme,
+                'theme' => $theme,
                 'themes' => $themes,
             ]);
+
+            // Ajouter un cookie pour marquer le pop-up comme affiché
+            $response->headers->setCookie(new Cookie(
+                'popup_shown',
+                'true',
+                time() + (365 * 24 * 60 * 60), // 1 year
+                '/',
+                null,
+                false,
+                false
+            ));
+
+            return $response;
         }
 
-        // Si la session indiquant que le pop-up a déjà été affiché existe, redirigez l'utilisateur vers une autre page
+        // Si le pop-up a déjà été affiché, rediriger vers la page d'accueil de l'étudiant
         return $this->redirectToRoute('student_courses', ['idS' => $idS]);
     }
 
     #[Route('/process/popup/submission', name: 'process_popup_submission', methods: ['POST'])]
-    public function processPopupSubmission(Request $request, int $idS, SessionInterface $session): Response
+    public function processPopupSubmission(Request $request, int $idS): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
 
         // Récupérer les données soumises par l'utilisateur à partir du formulaire pop-up
         $formData = $request->request->all();

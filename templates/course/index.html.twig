@@ -1,80 +1,420 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste de cours</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Gestion des Cours</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --border-color: #e0e0e0;
+        }
 
-    {% if theme == 'light' %}
-        <link rel="stylesheet" href="{{ asset('css/theme-light.css') }}">
-    {% else %}
-        <link rel="stylesheet" href="{{ asset('css/theme-dark.css') }}">
-    {% endif %}
+        body {
+            {% if theme == 'dark' %}
+            background: #1a1a2e;
+            color: #ecf0f1;
+            {% else %}
+            background: var(--light-bg);
+            color: var(--dark-text);
+            {% endif %}
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-custom h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .navbar-custom .nav-links {
+            display: flex;
+            gap: 15px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-custom .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-custom .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .navbar-custom .logout:hover {
+            background: rgba(231, 76, 60, 0.7);
+        }
+
+        .toolbar {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-theme {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-theme:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-new {
+            background: linear-gradient(135deg, var(--success-color) 0%, #229954 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-new:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
+            color: white;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-box button {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-box button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+
+        .table thead th {
+            border: none;
+            font-weight: 600;
+            padding: 15px;
+        }
+
+        .table tbody td {
+            padding: 15px;
+            border-color: var(--border-color);
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background: var(--light-bg);
+            transition: all 0.2s ease;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            font-size: 18px;
+        }
+
+        .action-buttons a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+        }
+
+        .action-buttons a:hover {
+            color: var(--secondary-color);
+            transform: scale(1.2);
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 12px;
+            padding: 60px 30px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            color: var(--dark-text);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        {% if theme == 'dark' %}
+        .table-container {
+            background: #34495e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .table tbody tr:hover {
+            background: #3d5268;
+        }
+
+        .table tbody td {
+            color: #ecf0f1;
+            border-color: #2c3e50;
+        }
+
+        .search-box input {
+            background: #34495e;
+            border-color: #445a6f;
+            color: #ecf0f1;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .action-buttons a {
+            color: #667eea;
+        }
+
+        .action-buttons a:hover {
+            color: #764ba2;
+        }
+
+        .empty-state {
+            background: #34495e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .empty-state h3 {
+            color: #ecf0f1;
+        }
+
+        .empty-state p {
+            color: #bdc3c7;
+        }
+        {% endif %}
+
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+
+            .table {
+                font-size: 14px;
+            }
+
+            .table thead th,
+            .table tbody td {
+                padding: 10px;
+            }
+
+            .navbar-custom h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class="px-2 flex justify-between items-center">
-        <h1>Tous les cours</h1>
-        <div class="flex">
-    <ul>
-        <li><a href="{{ path('app_admin', {'idA': admin_id}) }}" class="button">Accueil</a></li>
-        <li><a href="{{ path('qcm_index', {'idA': admin_id}) }}" class="button">QCM</a></li>
-        <li><a href="{{ path('user_index', {'idA': admin_id}) }}" class="button">Utilisateurs</a></li>
-        <li><a href="{{ path('app_logout') }}"  class="logout border"><i class="fas fa-sign-out-alt"></i> </a></li>
-    </ul>
-</div>
+    <!-- Navbar -->
+    <div class="navbar-custom">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <h1><i class="fas fa-book"></i> Gestion des Cours</h1>
+            <ul class="nav-links">
+                <li><a href="{{ path('app_admin', {'idA': admin_id}) }}"><i class="fas fa-home"></i> Accueil</a></li>
+                <li><a href="{{ path('qcm_index', {'idA': admin_id}) }}"><i class="fas fa-question-circle"></i> QCM</a></li>
+                <li><a href="{{ path('user_index', {'idA': admin_id}) }}"><i class="fas fa-users"></i> Utilisateurs</a></li>
+                <li><a href="{{ path('app_logout') }}" class="logout"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+            </ul>
+        </div>
+    </div>
 
-
-    </nav>
-
-      <div class="flex justify-between my-4">
-            <div class="flex">
-                <form action="{{ path('app_admin_change_theme', {'idA': admin_id}) }}" method="post" class="m-4">
-                    <input type="hidden" name="theme" value="{{ theme == 'light' ? 'dark' : 'light' }}">
-                    <button type="submit" class="button"> <i class="fa fa-adjust"></i> </button>
-                </form>
-                <a href="{{ path('new_course', {'idA': admin_id}) }}" class="m-4 plus ">
-                    <i class="fas fa-plus-circle"></i>
-                </a>
-            </div>
-
-            <div>
-                <form action="{{ path('search_course', {'idA': admin_id}) }}" method="get" class="flex">
-                    <input type="text" name="query" placeholder="Rechercher..." class="m-2 p-2 rounded search">
-                    <button type="submit" class="button"><i class="fas fa-search rounded"></i></button>
-                </form>
-            </div>
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <form action="{{ path('app_admin_change_theme', {'idA': admin_id}) }}" method="post" style="margin: 0;">
+                <input type="hidden" name="theme" value="{{ theme == 'light' ? 'dark' : 'light' }}">
+                <button type="submit" class="btn-theme">
+                    <i class="fas fa-{{ theme == 'light' ? 'moon' : 'sun' }}"></i>
+                </button>
+            </form>
+            <a href="{{ path('new_course', {'idA': admin_id}) }}" class="btn-new">
+                <i class="fas fa-plus-circle"></i> Nouveau Cours
+            </a>
         </div>
 
-    <div class="container mx-auto px-4 py-8">
-      
-
-        <table class="w-full shadow-md rounded-lg overflow-hidden">
-            <thead class="uppercase text-sm leading-normal">
-                <tr class="haut">
-                    <th class="py-3 px-6 text-left">Nom du cours</th>
-                    <th class="py-3 px-6 text-left">Thème</th>
-                    <th class="py-3 px-6 text-center">Actions</th> 
-                </tr>
-            </thead>
-            <tbody class="text-sm font-light">
-                {% for course in courses %}
-                    <tr class="border-b border-gray-200 ">
-                        <td class="py-3 px-6 text-left whitespace-nowrap">{{ course.name }}</td>
-                        <td class="py-3 px-6 text-left">{{ course.theme.name }}</td>
-                        <td class="py-3 px-6 text-center">
-                            <a href="{{ path('show_course', {'idA': admin_id, 'id': course.id}) }}"><i class="fas fa-eye"></i> </a>
-                            <a href="{{ path('edit_course', {'idA': admin_id, 'id': course.id}) }}"><i class="fas fa-edit"></i></a>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="3">No records found</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Rechercher un cours..." class="">
+            <button type="button" onclick="document.getElementById('searchInput').value = ''; filterCourses()"><i class="fas fa-search"></i></button>
+        </div>
     </div>
+
+    <!-- Admin Container -->
+    <div class="admin-container">
+        {% if courses|length > 0 %}
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Nom du Cours</th>
+                            <th>Thème</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for course in courses %}
+                            <tr>
+                                <td>{{ course.name }}</td>
+                                <td>{{ course.theme.name }}</td>
+                                <td class="text-center">
+                                    <div class="action-buttons">
+                                        <a href="{{ path('show_course', {'idA': admin_id, 'id': course.id}) }}" title="Voir">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('edit_course', {'idA': admin_id, 'id': course.id}) }}" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h3>Aucun cours trouvé</h3>
+                <p>Créez votre premier cours en cliquant sur le bouton "Nouveau Cours"</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function filterCourses() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const name = row.cells[0].textContent.toLowerCase();
+                const theme = row.cells[1].textContent.toLowerCase();
+                
+                if (name.includes(input) || theme.includes(input)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Recherche en temps réel
+        document.getElementById('searchInput').addEventListener('keyup', filterCourses);
+    </script>
 </body>
 </html>

@@ -1,34 +1,309 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Edit User{% endblock %}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    {% if theme == 'light' %}
-        <link rel="stylesheet" href="{{ asset('css/theme-light.css') }}">
-    {% else %}
-        <link rel="stylesheet" href="{{ asset('css/theme-dark.css') }}">
-    {% endif %}
+    <title>Modifier l'Utilisateur</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #27ae60;
+            --danger-color: #e74c3c;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            {% if theme == 'dark' %}
+            background: #1a1a2e;
+            color: #ecf0f1;
+            {% else %}
+            background: var(--light-bg);
+            color: var(--dark-text);
+            {% endif %}
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-custom h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .navbar-custom .nav-links {
+            display: flex;
+            gap: 15px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-custom .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-custom .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .form-card h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-text);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 10px;
+            display: block;
+            font-size: 16px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--success-color) 0%, #229954 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
+            color: white;
+        }
+
+        .btn-back {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .btn-back:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #c0392b 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.4);
+            color: white;
+        }
+
+        {% if theme == 'dark' %}
+        .form-card {
+            background: #34495e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-card h2 {
+            color: #ecf0f1;
+        }
+
+        .form-group label {
+            color: #ecf0f1;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: #2c3e50;
+            border-color: #445a6f;
+            color: #ecf0f1;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+        {% endif %}
+
+        @media (max-width: 768px) {
+            .navbar-custom h1 {
+                font-size: 22px;
+            }
+
+            .form-card {
+                padding: 25px;
+            }
+
+            .form-card h2 {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
 
-
 <body>
-
-
-    <nav class=" flex justify-between items-center px-4">
-        <h1 class="m-2">Modifier un utilisateur</h1>
-        <div>
-            <a href="{{ path('user_index', { 'idA': admin_id }) }}" class="button"><i class="fas fa-arrow-rotate-left"></i></a>
+    <!-- Navbar -->
+    <div class="navbar-custom">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <h1><i class="fas fa-user-edit"></i> Modifier l'Utilisateur</h1>
+            <ul class="nav-links">
+                <li><a href="{{ path('user_index', {'idA': admin_id}) }}"><i class="fas fa-arrow-left"></i> Retour aux Utilisateurs</a></li>
+            </ul>
         </div>
-    </nav>
-
-
-
-    
-    <div class="mx-auto mt-8 max-w-lg p-4 rounded-lg shadow-lg overflow-hidden">
-        {{ include('user/_form.html.twig') }}
     </div>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <div class="form-card">
+            <h2>
+                <i class="fas fa-user-edit"></i>
+                {{ user.username }}
+            </h2>
+
+            {{ form_start(form, {'attr': {'class': ''}}) }}
+
+            <div class="form-group">
+                {{ form_label(form.username, 'Nom d\'Utilisateur') }}
+                {{ form_widget(form.username, {'attr': {'class': '', 'placeholder': 'Entrez le nom d\'utilisateur'}}) }}
+                {{ form_errors(form.username) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.email, 'Email') }}
+                {{ form_widget(form.email, {'attr': {'class': '', 'placeholder': 'Entrez l\'email', 'type': 'email'}}) }}
+                {{ form_errors(form.email) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.firstname, 'Prénom') }}
+                {{ form_widget(form.firstname, {'attr': {'class': '', 'placeholder': 'Entrez le prénom'}}) }}
+                {{ form_errors(form.firstname) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.lastname, 'Nom') }}
+                {{ form_widget(form.lastname, {'attr': {'class': '', 'placeholder': 'Entrez le nom'}}) }}
+                {{ form_errors(form.lastname) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.password, 'Mot de Passe') }}
+                {{ form_widget(form.password, {'attr': {'class': '', 'placeholder': 'Entrez le mot de passe'}}) }}
+                {{ form_errors(form.password) }}
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Mettre à Jour
+            </button>
+
+            {{ form_end(form) }}
+
+            <div style="margin-top: 20px;">
+                <a href="{{ path('user_index', {'idA': admin_id}) }}" class="btn-back">
+                    <i class="fas fa-times"></i> Annuler
+                </a>
+
+                <form method="post" action="{{ path('delete_user', {'idA': admin_id, 'id': user.id}) }}" style="display: inline-block; width: 100%;">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                    <button type="submit" class="btn-delete" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')">
+                        <i class="fas fa-trash"></i> Supprimer l'Utilisateur
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

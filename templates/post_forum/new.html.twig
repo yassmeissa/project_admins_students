@@ -1,47 +1,307 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Nouveau Post{% endblock %}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    {% if theme == 'light' %}
-        <link rel="stylesheet" href="{{ asset('css/theme-light.css') }}">
-    {% else %}
-        <link rel="stylesheet" href="{{ asset('css/theme-dark.css') }}">
-    {% endif %}
+    <title>Créer un Nouveau Post</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #27ae60;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            {% if theme == 'dark' %}
+            background: #1a1a2e;
+            color: #ecf0f1;
+            {% else %}
+            background: var(--light-bg);
+            color: var(--dark-text);
+            {% endif %}
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-custom h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .navbar-custom .nav-links {
+            display: flex;
+            gap: 15px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-custom .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-custom .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .form-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-card h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-text);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: var(--dark-text);
+            margin-bottom: 10px;
+            display: block;
+            font-size: 15px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--success-color) 0%, #229954 100%);
+            border: none;
+            color: white;
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.4);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: var(--border-color);
+            border: none;
+            color: var(--dark-text);
+            padding: 12px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cancel:hover {
+            background: #bdc3c7;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .form-error {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        {% if theme == 'dark' %}
+        .form-card {
+            background: #34495e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-card h2 {
+            color: #ecf0f1;
+        }
+
+        .form-group label {
+            color: #ecf0f1;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: #2c3e50;
+            border-color: #445a6f;
+            color: #ecf0f1;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .btn-cancel {
+            background: #445a6f;
+            color: #ecf0f1;
+        }
+
+        .btn-cancel:hover {
+            background: #556a7f;
+        }
+        {% endif %}
+
+        @media (max-width: 768px) {
+            .navbar-custom h1 {
+                font-size: 22px;
+            }
+
+            .form-card {
+                padding: 25px;
+            }
+
+            .form-card h2 {
+                font-size: 22px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn-submit,
+            .btn-cancel {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-
-    <nav class=" flex justify-between items-center p-2">
-        <h1>Nouveau Post</h1>
-        <div class="flex">
-            <ul>
-                <li><a href="{{ path('app_student', {'idS': idS}) }}" class="button">Accueil</a></li>
-                <li><a href="{{ path('student_courses', {'idS' : idS}) }}"  class="button">Mes Cours </a></li>
-                <li><a href="{{ path('post_forum_index', {'idS': idS}) }}" class="button"><i class="fas fa-arrow-rotate-left"></i> </a></li>
+    <!-- Navbar -->
+    <div class="navbar-custom">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <h1><i class="fas fa-pen"></i> Créer un Nouveau Post</h1>
+            <ul class="nav-links">
+                <li><a href="{{ path('app_student', {'idS': idS}) }}"><i class="fas fa-home"></i> Accueil</a></li>
+                <li><a href="{{ path('post_forum_index', {'idS': idS}) }}"><i class="fas fa-arrow-left"></i> Retour</a></li>
             </ul>
         </div>
-    </nav>
+    </div>
 
+    <!-- Form Container -->
+    <div class="form-container">
+        <div class="form-card">
+            <h2>
+                <i class="fas fa-pencil-alt"></i>
+                Partager votre message
+            </h2>
 
-    <div class="mx-auto mt-8 max-w-lg p-4 rounded-lg shadow-lg overflow-hidden">
-            {{ form_start(form, {'attr': {'class': 'form-bg m-4 p-4'}}) }}
-            <div class="mb-4 form ">
-                    {{ form_label(form.course, 'Cours :', {'class': 'block text-gray-700 font-bold mb-2'}) }}
-                    {{ form_widget(form.course, {'class': 'form-input w-full mt-1'}) }}
-                </div> 
-                <div class="mb-4 form">
-                    {{ form_label(form.content, 'Texte :', {'class': 'block text-gray-700 font-bold mb-2'}) }}
-                    {{ form_widget(form.content, {'attr': {'class': 'form-input w-full mt-1 '}}) }}                    
+            {{ form_start(form) }}
+                <div class="form-group">
+                    {{ form_label(form.course, 'Cours') }}
+                    {{ form_widget(form.course, {'attr': {'class': 'form-control'}}) }}
+                    {% if form.course.vars.errors|length > 0 %}
+                        <div class="form-error">
+                            {% for error in form.course.vars.errors %}
+                                <i class="fas fa-exclamation-circle"></i> {{ error.message }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
 
+                <div class="form-group">
+                    {{ form_label(form.content, 'Votre Message') }}
+                    {{ form_widget(form.content, {'attr': {'class': 'form-control', 'placeholder': 'Écrivez votre message ici...'}}) }}
+                    {% if form.content.vars.errors|length > 0 %}
+                        <div class="form-error">
+                            {% for error in form.content.vars.errors %}
+                                <i class="fas fa-exclamation-circle"></i> {{ error.message }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
 
-                 
-                <button type="submit" class="my-2 button ">{{ button_label|default('Créer') }}</button>
-      
-                {{ form_end(form) }}
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-check"></i> Publier le Message
+                    </button>
+                    <a href="{{ path('post_forum_index', {'idS': idS}) }}" class="btn-cancel">
+                        <i class="fas fa-times"></i> Annuler
+                    </a>
+                </div>
+            {{ form_end(form) }}
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

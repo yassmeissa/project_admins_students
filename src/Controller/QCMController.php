@@ -10,7 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -30,9 +30,9 @@ class QCMController extends AbstractController
     
   
     #[Route('/admin/{idA}/qcmList', name: 'qcm_index')]
-    public function index(int $idA, SessionInterface $session): Response
+    public function index(int $idA, Request $request): Response
     {
-        $theme = $session->get('theme', 'light'); 
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
         // Récupérer le EntityManager
         $entityManager = $this->doctrine->getManager();
         
@@ -56,9 +56,9 @@ class QCMController extends AbstractController
 
 
     #[Route('admin/{idA}/qcm/create', name: 'qcm_create')]
-    public function createQCM(Request $request, SerializerInterface $serializer, int $idA, SessionInterface $session ): Response
+    public function createQCM(Request $request, SerializerInterface $serializer, int $idA ): Response
     {
-        $theme = $session->get('theme', 'light'); 
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
         $qcm = new QCM();
         // Créez le formulaire à partir du type de formulaire QCMType
         $form = $this->createForm(QCMType::class, $qcm);
@@ -99,9 +99,9 @@ class QCMController extends AbstractController
     
 
     #[Route('admin/{idA}/course/{idC}/qcm/{id}', name: 'qcm_show', methods: ['GET'])]
-    public function show(int $idA, int $idC, int $id, SessionInterface $session): Response
+    public function show(int $idA, int $idC, int $id, Request $request): Response
     {
-        $theme = $session->get('theme', 'light'); 
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
         $qcm = $this->doctrine->getRepository(QCM::class)->find($id);
         
         if (!$qcm) {
@@ -117,9 +117,9 @@ class QCMController extends AbstractController
     }
     
     #[Route('admin/{idA}/course/{idC}/qcm/{id}/edit', name: 'qcm_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, int $idA,int $idC, int $id, SessionInterface $session): Response
+    public function edit(Request $request, int $idA,int $idC, int $id): Response
     {
-        $theme = $session->get('theme', 'light'); 
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
         // Récupérer le QCM à modifier depuis la base de données
         $qcm = $this->doctrine->getRepository(QCM::class)->find($id);
         
@@ -177,9 +177,9 @@ class QCMController extends AbstractController
     
 
     #[Route('/admin/{idA}/qcm/search', name: 'search_qcm', methods: ['GET'])]
-    public function search(Request $request, int $idA, QCMRepository $QCMRepository, SessionInterface $session): Response
+    public function search(Request $request, int $idA, QCMRepository $QCMRepository): Response
     {
-        $theme = $session->get('theme', 'light'); 
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
         // Récupérer le terme de recherche depuis la requête
         $searchTerm = $request->query->get('query');
     

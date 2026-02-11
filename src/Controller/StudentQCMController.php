@@ -14,7 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/student/{idS}')]
@@ -46,9 +46,9 @@ class StudentQCMController extends AbstractController
     
 
     #[Route('/courses/{courseId}/qcm/{qcmId}', name: 'student_qcm', methods: ['GET'])]
-    public function showRandomQcm(QCMRepository $QCMRepository, CourseRepository $courseRepository, QuestionRepository $questionRepository, int $idS, int $courseId, int $qcmId, NoteStudentRepository $noteStudentRepository, SessionInterface $session): Response
+    public function showRandomQcm(QCMRepository $QCMRepository, CourseRepository $courseRepository, QuestionRepository $questionRepository, int $idS, int $courseId, int $qcmId, NoteStudentRepository $noteStudentRepository, Request $request): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
 
         // Vérifier le nombre de fois que l'utilisateur a passé ce QCM
         $userAttempts = $noteStudentRepository->countAttemptsByUserAndQCM($idS, $qcmId);
@@ -257,9 +257,9 @@ class StudentQCMController extends AbstractController
         
     
     #[Route('/recommendations', name: 'recommendations')]
-    public function recommendations(Request $request, int $idS, QCMRepository $QCMRepository, QuestionRepository $questionRepository, NoteStudentRepository $noteStudentRepository, SessionInterface $session): Response
+    public function recommendations(Request $request, int $idS, QCMRepository $QCMRepository, QuestionRepository $questionRepository, NoteStudentRepository $noteStudentRepository): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
 
         // Récupérer les réponses du QCM depuis les cookies
         $qcmResults = json_decode($request->cookies->get('qcm_results'), true);

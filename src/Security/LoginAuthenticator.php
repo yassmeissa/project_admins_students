@@ -30,7 +30,9 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
     {
         $username = $request->request->get('username', '');
 
-        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $username);
+        if ($request->hasSession()) {
+            $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $username);
+        }
 
         return new Passport(
             new UserBadge($username),
@@ -44,8 +46,10 @@ class LoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($targetPath);
+        if ($request->hasSession()) {
+            if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+                return new RedirectResponse($targetPath);
+            }
         }
 
         // For example:

@@ -1,64 +1,312 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Recommendations{% endblock %}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    {% if theme == 'light' %}
-        <link rel="stylesheet" href="{{ asset('css/theme-light.css') }}">
-    {% else %}
-        <link rel="stylesheet" href="{{ asset('css/theme-dark.css') }}">
-    {% endif %}
+    <title>Recommandations - Résultats du QCM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #27ae60;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            {% if theme == 'dark' %}
+            background: #1a1a2e;
+            color: #ecf0f1;
+            {% else %}
+            background: var(--light-bg);
+            color: var(--dark-text);
+            {% endif %}
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-custom h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .navbar-custom .nav-links {
+            display: flex;
+            gap: 15px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-custom .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-custom .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .navbar-custom .logout:hover {
+            background: rgba(231, 76, 60, 0.7);
+        }
+
+        .toolbar {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            padding: 0 20px;
+        }
+
+        .btn-theme {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-theme:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .results-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .score-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .score-card h2 {
+            font-size: 32px;
+            color: var(--dark-text);
+            margin-bottom: 20px;
+        }
+
+        .score-value {
+            font-size: 64px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 20px 0;
+        }
+
+        .recommendation-text {
+            font-size: 18px;
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+
+        .recommendations-section h3 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-text);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recommendations-section h3 i {
+            color: var(--primary-color);
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .course-recommendation-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-recommendation-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .course-recommendation-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .course-recommendation-info {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .course-recommendation-name {
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            color: var(--dark-text);
+        }
+
+        {% if theme == 'dark' %}
+        .score-card {
+            background: #34495e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .score-card h2 {
+            color: #ecf0f1;
+        }
+
+        .recommendation-text {
+            color: #bdc3c7;
+        }
+
+        .recommendations-section h3 {
+            color: #ecf0f1;
+        }
+
+        .course-recommendation-card {
+            background: #34495e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .course-recommendation-card:hover {
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
+            background: #3d5268;
+        }
+
+        .course-recommendation-name {
+            color: #ecf0f1;
+        }
+        {% endif %}
+
+        @media (max-width: 768px) {
+            .score-card {
+                padding: 30px 20px;
+            }
+
+            .score-card h2 {
+                font-size: 24px;
+            }
+
+            .score-value {
+                font-size: 48px;
+            }
+
+            .course-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar-custom h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<nav class="p-2 flex justify-between items-center">
-    <h1>Recommandations</h1>
-    <div class="flex">
-        <ul>
-            <li><a href="{{ path('app_student', {'idS': idS}) }}" class="button">Accueil</a></li>
-            <li><a href="{{ path('post_forum_index', {'idS': idS}) }}" class="button">Mes Forums</a></li>
-            <li><a href="{{ path('student_courses', {'idS': idS}) }}" class="button ">Mes Courses</a></li>
-            <li><a href="{{ path('app_logout') }}"  class="logout border"><i class="fas fa-sign-out-alt"></i> </a></li>
-        </ul>
-    </div>
-</nav>
-
-<div class="flex justify-between">
-    <form action="{{ path('app_student_change_theme', {'idS': idS}) }}" method="post" class="m-4">
-        <input type="hidden" name="theme" value="{{ theme == 'light' ? 'dark' : 'light' }}">
-        <button type="submit" class="button"> <i class="fa fa-adjust"></i> </button>
-    </form>
-</div>
-
-<div class="container mx-auto px-4 py-8">
-    <div>
-        <h2>Votre nouveau score est : {{ studentScore }}</h2>
-
-
-        {% if recommendation is not empty %}
-            <div>
-                <p>{{ recommendation }}</p>
-            </div>
-             {% endif %}
-    </div>
-    
-    {% if recommended_courses is not empty %}
-        <div class="mt-8">
-            <h3 class="text-lg font-semibold mb-2">Vous pourriez également aimer :</h3>
-            <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {% for course in recommended_courses %}
-                    <a href="{{ path('course_lessons', {'idS': idS , 'courseId': course.id}) }}" class="btngrid border p-4 rounded-md ">
-                        <img src="{{ course.theme.imageUrl }}" alt="{{ course.theme.name }}" class="mx-auto h-20 w-20 object-cover h-40 w-48">
-                        <p class="text-center mt-2">{{ course.name }}</p>
-                    </a>
-                {% endfor %}
+    <!-- Navbar -->
+    <div class="navbar-custom">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <h1><i class="fas fa-trophy"></i> Résultats du QCM</h1>
+            <ul class="nav-links">
+                <li><a href="{{ path('app_student', {'idS': idS}) }}"><i class="fas fa-home"></i> Accueil</a></li>
+                <li><a href="{{ path('post_forum_index', {'idS': idS}) }}"><i class="fas fa-comments"></i> Forums</a></li>
+                <li><a href="{{ path('student_courses', {'idS': idS}) }}"><i class="fas fa-book"></i> Mes Cours</a></li>
+                <li><a href="{{ path('app_logout') }}" class="logout"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
             </ul>
         </div>
-    {% endif %}
-</div>
+    </div>
 
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <form action="{{ path('app_student_change_theme', {'idS': idS}) }}" method="post" style="margin: 0;">
+            <input type="hidden" name="theme" value="{{ theme == 'light' ? 'dark' : 'light' }}">
+            <button type="submit" class="btn-theme">
+                <i class="fas fa-{{ theme == 'light' ? 'moon' : 'sun' }}"></i>
+                {{ theme == 'light' ? 'Mode Sombre' : 'Mode Clair' }}
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Container -->
+    <div class="results-container">
+        <!-- Score Card -->
+        <div class="score-card">
+            <h2>Votre Résultat</h2>
+            <div class="score-value">{{ studentScore }}%</div>
+            
+            {% if recommendation is not empty %}
+                <p class="recommendation-text">{{ recommendation }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Recommendations Section -->
+        {% if recommended_courses is not empty %}
+            <div class="recommendations-section">
+                <h3>
+                    <i class="fas fa-lightbulb"></i>
+                    Vous pourriez également aimer
+                </h3>
+                
+                <div class="course-grid">
+                    {% for course in recommended_courses %}
+                        <a href="{{ path('course_lessons', {'idS': idS, 'courseId': course.id}) }}" class="course-recommendation-card">
+                            {% if course.theme and course.theme.imageUrl %}
+                                <img src="{{ course.theme.imageUrl }}" alt="{{ course.theme.name }}" class="course-recommendation-image">
+                            {% else %}
+                                <div class="course-recommendation-image"></div>
+                            {% endif %}
+                            <div class="course-recommendation-info">
+                                <p class="course-recommendation-name">{{ course.name }}</p>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

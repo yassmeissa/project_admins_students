@@ -1,58 +1,324 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Leçons{% endblock %}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    {% if theme == 'light' %}
-        <link rel="stylesheet" href="{{ asset('css/theme-light.css') }}">
-    {% else %}
-        <link rel="stylesheet" href="{{ asset('css/theme-dark.css') }}">
-    {% endif %}
+    <title>Leçons - {{ course.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #27ae60;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            {% if theme == 'dark' %}
+            background: #1a1a2e;
+            color: #ecf0f1;
+            {% else %}
+            background: var(--light-bg);
+            color: var(--dark-text);
+            {% endif %}
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-custom h1 {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .navbar-custom .nav-links {
+            display: flex;
+            gap: 15px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar-custom .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar-custom .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .navbar-custom .logout:hover {
+            background: rgba(231, 76, 60, 0.7);
+        }
+
+        .toolbar {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-theme {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-theme:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-qcm {
+            background: linear-gradient(135deg, var(--success-color) 0%, #229954 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-qcm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
+            color: white;
+        }
+
+        .lessons-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px 40px;
+        }
+
+        .lessons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .lesson-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .lesson-card-icon {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .lesson-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark-text);
+        }
+
+        .lesson-card p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .lesson-card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .lesson-card-link:hover {
+            color: var(--secondary-color);
+            transform: translateX(5px);
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 12px;
+            padding: 60px 30px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            color: var(--dark-text);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        {% if theme == 'dark' %}
+        .lesson-card {
+            background: #34495e;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .lesson-card:hover {
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
+            background: #3d5268;
+        }
+
+        .lesson-card h3 {
+            color: #ecf0f1;
+        }
+
+        .lesson-card p {
+            color: #bdc3c7;
+        }
+
+        .empty-state {
+            background: #2c3e50;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .empty-state h3 {
+            color: #ecf0f1;
+        }
+
+        .empty-state p {
+            color: #bdc3c7;
+        }
+        {% endif %}
+
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .lessons-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar-custom h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<nav class="p-2 flex justify-between items-center">
-    <h1>Leçons du cours {{ course.name }}</h1>
-    <div class="flex">
-        <ul>
-            <li><a href="{{ path('app_student', {'idS': idS}) }}" class="button">Accueil</a></li>
-            <li><a href="{{ path('post_forum_index', {'idS': idS}) }}" class="button">Mes Forums</a></li>
-            <li><a href="{{ path('app_logout') }}"  class="logout border"><i class="fas fa-sign-out-alt"></i> </a></li>
-        </ul>
+    <!-- Navbar -->
+    <div class="navbar-custom">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <h1><i class="fas fa-book-open"></i> Leçons: {{ course.name }}</h1>
+            <ul class="nav-links">
+                <li><a href="{{ path('app_student', {'idS': idS}) }}"><i class="fas fa-home"></i> Accueil</a></li>
+                <li><a href="{{ path('student_courses', {'idS': idS}) }}"><i class="fas fa-arrow-left"></i> Retour</a></li>
+                <li><a href="{{ path('post_forum_index', {'idS': idS}) }}"><i class="fas fa-comments"></i> Forums</a></li>
+                <li><a href="{{ path('app_logout') }}" class="logout"><i class="fas fa-sign-out-alt"></i> Déconnexion</a></li>
+            </ul>
+        </div>
     </div>
-</nav>
 
-<div class="flex justify-between my-4">
-
-    <div class="flex justify-between">
-        <form action="{{ path('app_student_change_theme', {'idS': idS}) }}" method="post" class="m-4">
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <form action="{{ path('app_student_change_theme', {'idS': idS}) }}" method="post" style="margin: 0;">
             <input type="hidden" name="theme" value="{{ theme == 'light' ? 'dark' : 'light' }}">
-            <button type="submit" class="button"> <i class="fa fa-adjust"></i> </button>
+            <button type="submit" class="btn-theme">
+                <i class="fas fa-{{ theme == 'light' ? 'moon' : 'sun' }}"></i>
+                {{ theme == 'light' ? 'Mode Sombre' : 'Mode Clair' }}
+            </button>
         </form>
-        <a href="{{ path('student_courses', {'idS': idS}) }}" class="button m-4"><i class="fas fa-arrow-rotate-left"></i></a>
-    </div>
-
-
-    <div>
+        
         {% if qcm is not null %}
-            <a href="{{ path('student_qcm', {'idS': idS, 'courseId': course.id, 'qcmId': qcm.id}) }}" class="mb-4 block button w-items hover:underline">Faire le QCM</a>
+            <a href="{{ path('student_qcm', {'idS': idS, 'courseId': course.id, 'qcmId': qcm.id}) }}" class="btn-qcm">
+                <i class="fas fa-quiz"></i> Faire le QCM
+            </a>
         {% endif %}
     </div>
-</div>
-<div class="container mx-auto px-4 py-8">
-    <div class="grid grid-cols-3 gap-6">
-        {% for lesson in lessons %}
-            <div class="shadow-md rounded-md p-6">
-                <h2 class="text-xl font-semibold">{{ lesson.name }}</h2>
-                <p class="text-gray-700 mb-4">Fichier: <a href="{{ path('download_userlesson',{'idS': idS, 'courseId': course.id, 'id': lesson.id}) }}" class=" hover:underline">{{ lesson.getOriginalFileName() }}</a></p>
+
+    <!-- Lessons Container -->
+    <div class="lessons-container">
+        {% if lessons|length > 0 %}
+            <div class="lessons-grid">
+                {% for lesson in lessons %}
+                    <div class="lesson-card">
+                        <div class="lesson-card-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <h3>{{ lesson.name }}</h3>
+                        <p>Fichier pédagogique pour cette leçon</p>
+                        <a href="{{ path('download_userlesson', {'idS': idS, 'courseId': course.id, 'id': lesson.id}) }}" class="lesson-card-link">
+                            <i class="fas fa-download"></i>
+                            {{ lesson.getOriginalFileName() }}
+                        </a>
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h3>Aucune leçon disponible</h3>
+                <p>Il n'y a pas encore de leçons pour ce cours.</p>
+            </div>
+        {% endif %}
     </div>
-</div>
 
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

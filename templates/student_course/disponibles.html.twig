@@ -1,38 +1,410 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des cours disponibles</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    {% if theme == 'light' %}
-        <link rel="stylesheet" href="{{ asset('css/theme-light.css') }}">
-    {% else %}
-        <link rel="stylesheet" href="{{ asset('css/theme-dark.css') }}">
-    {% endif %}
+    <title>Cours Disponibles</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #27ae60;
+            --light-bg: #f8f9fa;
+            --dark-text: #2c3e50;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            {% if theme == 'dark' %}
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ecf0f1;
+            {% else %}
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: var(--dark-text);
+            {% endif %}
+            min-height: 100vh;
+            padding: 40px 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .courses-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .courses-header {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .courses-header h1 {
+            font-size: 32px;
+            color: var(--dark-text);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .courses-header p {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        {% if theme == 'dark' %}
+        .courses-header {
+            background: #2c3e50;
+            color: #ecf0f1;
+        }
+
+        .courses-header h1,
+        .courses-header p {
+            color: #ecf0f1;
+        }
+
+        .courses-header p {
+            color: #bdc3c7;
+        }
+        {% endif %}
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .course-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .course-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-color);
+        }
+
+        {% if theme == 'dark' %}
+        .course-card {
+            background: #34495e;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .course-card:hover {
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
+            background: #3d5268;
+        }
+
+        .course-card.selected {
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.1) 0%, rgba(39, 174, 96, 0.1) 100%);
+        }
+        {% endif %}
+
+        .course-card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 80px;
+        }
+
+        .course-card-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .course-icon {
+            font-size: 28px;
+            margin-right: 15px;
+            opacity: 0.9;
+        }
+
+        .course-card-body {
+            padding: 20px;
+        }
+
+        {% if theme == 'dark' %}
+        .course-card-header h3 {
+            color: #ecf0f1;
+        }
+
+        .course-card-body {
+            color: #bdc3c7;
+        }
+        {% endif %}
+
+        .course-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+        }
+
+        .course-checkbox input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            margin-right: 10px;
+            accent-color: var(--primary-color);
+        }
+
+        .course-checkbox label {
+            cursor: pointer;
+            margin: 0;
+            font-weight: 500;
+            color: var(--dark-text);
+        }
+
+        {% if theme == 'dark' %}
+        .course-checkbox label {
+            color: #ecf0f1;
+        }
+        {% endif %}
+
+        .course-card.selected {
+            border-color: var(--success-color);
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.02) 0%, rgba(39, 174, 96, 0.02) 100%);
+        }
+
+        .course-card.selected .course-card-header {
+            background: linear-gradient(135deg, var(--success-color) 0%, #229954 100%);
+        }
+
+        .empty-state {
+            background: white;
+            border-radius: 15px;
+            padding: 60px 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            color: var(--dark-text);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        {% if theme == 'dark' %}
+        .empty-state {
+            background: #2c3e50;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .empty-state h3 {
+            color: #ecf0f1;
+        }
+
+        .empty-state p {
+            color: #bdc3c7;
+        }
+        {% endif %}
+
+        .courses-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .courses-count {
+            color: var(--dark-text);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .courses-count span {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-left: 10px;
+        }
+
+        {% if theme == 'dark' %}
+        .courses-footer {
+            background: #2c3e50;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .courses-count {
+            color: #ecf0f1;
+        }
+        {% endif %}
+
+        .btn-subscribe {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-subscribe:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-subscribe:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        {% if theme == 'dark' %}
+        .btn-subscribe:hover {
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+        {% endif %}
+
+        @media (max-width: 768px) {
+            .courses-header {
+                padding: 30px 20px;
+            }
+
+            .courses-header h1 {
+                font-size: 24px;
+            }
+
+            .courses-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .courses-footer {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .courses-count {
+                text-align: center;
+                width: 100%;
+            }
+
+            .btn-subscribe {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <div class="container mx-auto">
-            <h2 class="text-3xl font-bold m-4 p-4 text-center">Liste des cours disponibles</h2>
-            {% if courses is not empty %}
-            <form action="{{ path('inscrire_multiple' ,{'idS':idS}) }}" method="post" class="m-2">
-                <ul class="flex flex-wrap">
-                    {% for course in courses %}
-                        <li class="w-1/2"> 
-                            <input type="checkbox" id="course_{{ course.id }}" name="courses[]" value="{{ course.id }}">
-                            <label for="course_{{ course.id }}">{{ course.name }}</label>
-                        </li>
-                    {% endfor %}
-                </ul>
+    <div class="courses-container">
+        <div class="courses-header">
+            <h1><i class="fas fa-book"></i> Cours Disponibles</h1>
+            <p>Sélectionnez les cours qui vous intéressent et inscrivez-vous</p>
+        </div>
 
-                <button type="submit" class="m-2 button">M'inscrire</button>
+        {% if courses is not empty %}
+            <form action="{{ path('inscrire_multiple', {'idS': idS}) }}" method="post" id="coursesForm">
+                <div class="courses-grid">
+                    {% for course in courses %}
+                        <div class="course-card" id="course-{{ course.id }}">
+                            <div class="course-card-header">
+                                <span class="course-icon">
+                                    {% if 'Python' in course.name or 'Science' in course.name or 'Technolo' in course.name %}
+                                        <i class="fas fa-code"></i>
+                                    {% elseif 'Histoire' in course.name or 'Géographie' in course.name %}
+                                        <i class="fas fa-globe"></i>
+                                    {% elseif 'Art' in course.name or 'Musique' in course.name or 'Cinéma' in course.name or 'Littérature' in course.name %}
+                                        <i class="fas fa-palette"></i>
+                                    {% elseif 'Langue' in course.name or 'Anglais' in course.name or 'Espagnol' in course.name or 'Français' in course.name %}
+                                        <i class="fas fa-language"></i>
+                                    {% elseif 'Mathém' in course.name or 'Algèbre' in course.name or 'Calcul' in course.name %}
+                                        <i class="fas fa-calculator"></i>
+                                    {% elseif 'Santé' in course.name or 'Méde' in course.name or 'Anatomie' in course.name %}
+                                        <i class="fas fa-stethoscope"></i>
+                                    {% else %}
+                                        <i class="fas fa-book"></i>
+                                    {% endif %}
+                                </span>
+                                <h3>{{ course.name }}</h3>
+                            </div>
+                            <div class="course-card-body">
+                                <div class="course-checkbox">
+                                    <input type="checkbox" id="course_{{ course.id }}" name="courses[]" value="{{ course.id }}" onchange="updateCourseSelection(this)">
+                                    <label for="course_{{ course.id }}">S'inscrire à ce cours</label>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="courses-footer">
+                    <div class="courses-count">
+                        Cours sélectionnés: <span id="courseCount">0</span>
+                    </div>
+                    <button type="submit" class="btn-subscribe" id="submitBtn">
+                        <i class="fas fa-check-circle"></i> S'inscrire aux cours sélectionnés
+                    </button>
+                </div>
             </form>
         {% else %}
-            <p>Aucun cours disponible pour le moment.</p>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h3>Aucun cours disponible</h3>
+                <p>Il n'y a actuellement aucun cours disponible pour vous. Veuillez réessayer plus tard.</p>
+            </div>
         {% endif %}
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function updateCourseSelection(checkbox) {
+            const courseCard = checkbox.closest('.course-card');
+            const count = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            
+            if (checkbox.checked) {
+                courseCard.classList.add('selected');
+            } else {
+                courseCard.classList.remove('selected');
+            }
+            
+            document.getElementById('courseCount').textContent = count;
+            document.getElementById('submitBtn').disabled = count === 0;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const count = document.querySelectorAll('input[type="checkbox"]:checked').length;
+            document.getElementById('courseCount').textContent = count;
+            document.getElementById('submitBtn').disabled = count === 0;
+        });
+    </script>
 </body>
 </html>

@@ -10,7 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 use Symfony\Component\Routing\Annotation\Route;
 
 
@@ -26,9 +26,9 @@ class PostForumController extends AbstractController
         
     }
     #[Route('/', name: 'post_forum_index')]
-    public function index(PostForumRepository $postForumRepository, int $idS, SessionInterface $session): Response
+    public function index(PostForumRepository $postForumRepository, int $idS, Request $request): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
 
         // Récupérer tous les messages du forum
         $posts = $postForumRepository->findAll();
@@ -53,9 +53,9 @@ class PostForumController extends AbstractController
     }
     
     #[Route('/new', name: 'post_forum_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, int $idS, SessionInterface $session): Response
+    public function new(Request $request, int $idS): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
 
         $post = new PostForum();
         $form = $this->createForm(PostForumType::class, $post);
@@ -94,9 +94,9 @@ class PostForumController extends AbstractController
     
 
     #[Route('/{id}', name: 'post_forum_show', methods: ['GET'])]
-    public function show(PostForum $post, int $idS, SessionInterface $session): Response
+    public function show(PostForum $post, int $idS, Request $request): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
 
         return $this->render('post_forum/show.html.twig', [
             'post' => $post,
@@ -106,9 +106,9 @@ class PostForumController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'post_forum_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, PostForum $post, int $idS, SessionInterface $session): Response
+    public function edit(Request $request, PostForum $post, int $idS): Response
     {
-        $theme = $session->get('theme', 'light');
+        $theme = $request->cookies->has("theme") && $request->cookies->get("theme") === "dark" ? "dark" : "light";
 
         $form = $this->createForm(PostForumType::class, $post);
         $form->handleRequest($request);
@@ -128,7 +128,7 @@ class PostForumController extends AbstractController
     }
 
     #[Route('/{id}', name: 'post_forum_delete', methods: ['POST'])]
-    public function delete(Request $request, PostForum $post, int $idS, SessionInterface $session): Response
+    public function delete(Request $request, PostForum $post, int $idS): Response
     {
         if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
             $entityManager = $this->doctrine->getManager();
